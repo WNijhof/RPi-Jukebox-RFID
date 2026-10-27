@@ -29,6 +29,7 @@ class FakeApi:
         self.calls = []
         self.is_authorized = True
         self.fail_offset = False
+        self.nothing_loaded = False
 
     def devices(self):
         return [{'id': 'phone', 'name': 'Telefoon'}, {'id': 'box', 'name': 'Muziekbox'}]
@@ -39,6 +40,8 @@ class FakeApi:
     def play(self, device_id, context_uri=None, uris=None, offset_uri=None, position_ms=0):
         if offset_uri and self.fail_offset:
             raise SpotifyApiError(404, 'track not in context')
+        if self.nothing_loaded and context_uri is None and uris is None:
+            raise SpotifyApiError(403, 'Player command failed: Restriction violated')
         self.calls.append(('play', device_id, context_uri, uris, offset_uri, position_ms))
 
     def __getattr__(self, name):
@@ -218,6 +221,28 @@ def test_second_swipe_continues_when_paused(ctrl):
     c.api.calls.clear()
     c.play_card('spotify:playlist:p1')  # already playing: nothing happens
     assert c.api.calls == []
+
+
+def test_second_swipe_starts_again_when_spotify_stopped(ctrl):
+    c, _ = ctrl
+    c.play_card('spotify:playlist:p1')
+    c.is_playing = False
+    c.api.nothing_loaded = True  # Spotify stopped in the meantime: resume is refused
+    c.api.calls.clear()
+
+    c.play_card('spotify:playlist:p1')
+    assert ('play', 'box', 'spotify:playlist:p1', None, None, 0) in c.api.calls
+
+
+def test_pause_when_already_stopped_is_no_error(ctrl):
+    c, _ = ctrl
+    c.play_card('spotify:playlist:p1')
+
+    def refuse(device_id):
+        raise SpotifyApiError(403, 'Player command failed: Restriction violated')
+    c.api.pause = refuse
+    c.pause()
+    assert not c.is_playing
 
 
 def test_playerstatus_has_mpd_format(ctrl):

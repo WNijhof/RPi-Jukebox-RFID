@@ -309,11 +309,17 @@ class SpotifyCtrl:
 
         if self._active and uri == self.context_uri and self.second_swipe != 'restart':
             logger.info(f"Second swipe on {uri}: {self.second_swipe}")
-            if self.second_swipe == 'toggle':
-                return self.toggle()
-            if self.second_swipe == 'play' and not self.is_playing:
-                return self.play()
-            return
+            try:
+                if self.second_swipe == 'toggle':
+                    return self.toggle()
+                if self.second_swipe == 'play' and not self.is_playing:
+                    return self.play()
+                return
+            except SpotifyApiError as e:
+                if e.status != 403:
+                    raise
+                # 'Restriction violated': Spotify has nothing loaded anymore (playback stopped), start the card again
+                logger.info(f"Nothing to continue on Spotify, starting {uri} again")
 
         self._save_resume_position()
         self._take_over()
@@ -360,7 +366,12 @@ class SpotifyCtrl:
     def pause(self, state: int = 1):
         """Enforce pause to state (1: pause, 0: resume)"""
         if state:
-            self._call(self.api.pause)
+            try:
+                self._call(self.api.pause)
+            except SpotifyApiError as e:
+                # 'Restriction violated': already paused or stopped
+                if e.status != 403:
+                    raise
             self.progress_ms = self._elapsed_ms()
             self.is_playing = False
         else:
