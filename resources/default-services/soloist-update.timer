@@ -1,0 +1,12 @@
+[Unit]
+# Eigen uitbreiding muziekbox: daily check for a newer Soloist build
+Description=Daily update check for Spotify Soloist
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1d
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

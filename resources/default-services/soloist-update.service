@@ -1,0 +1,9 @@
+[Unit]
+# Eigen uitbreiding muziekbox: Soloist builds expire after 90 days, fetch a newer build if available
+Description=Update Spotify Soloist
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%%PROJECT_ROOT%%/installation/components/setup_spotify.sh update

@@ -120,7 +120,7 @@ battmon:
   shutdown_level: 3
 spotify:
   # Eigen uitbreiding muziekbox
-  # Name of the Spotify Connect speaker (must match --name of librespot)
+  # Name of the Spotify Connect speaker (must match --device-name of Soloist, see setup_spotify.sh)
   device_name: Muziekbox
   token_file: ../../shared/settings/spotify_token.json
   resume_file: ../../shared/settings/spotify_resume.json

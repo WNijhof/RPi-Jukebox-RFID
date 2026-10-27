@@ -1,0 +1,23 @@
+[Unit]
+# Eigen uitbreiding muziekbox: Spotify Connect speaker (Spotify Soloist), plays via the PulseAudio/PipeWire of the Jukebox
+Description=Spotify Connect (Spotify Soloist)
+After=network-online.target sound.target pulseaudio.service pipewire-pulse.service
+Wants=network-online.target
+
+[Service]
+# The API key lives outside the unit, readable for this user only (see setup_spotify.sh)
+EnvironmentFile=%h/.config/soloist/soloist.env
+# --initial-volume 100: the Jukebox volume (and its max volume) applies on the sound output,
+# the Spotify app can only turn the box down from there
+# --cache-size: keep the SD card from filling up
+ExecStart=%%SOLOIST_DIR%%/soloist \
+  --device-name "%%DEVICE_NAME%%" \
+  --api-key ${SOLOIST_API_KEY} \
+  --initial-volume 100 \
+  --cache-size 200
+# Builds expire after 90 days (exit code 10); soloist-update.timer fetches a new one
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

@@ -7,7 +7,8 @@ Plays Spotify playlists, albums, artists, tracks, podcasts and audiobooks on thi
 
 How it works:
 
-* librespot runs on the box as a Spotify Connect speaker (default name: *Muziekbox*) and plays into PulseAudio.
+* Spotify Soloist (Spotify's official headless client) runs on the box as a Spotify Connect speaker
+  (default name: *Muziekbox*) and plays into PulseAudio/PipeWire.
   Therefore, the Jukebox volume control and soft max volume also apply to Spotify.
 * This module tells Spotify (via the Web API) what to play on that speaker.
 * While Spotify is the active source, the regular player controls (``player.ctrl.toggle``, ``next``, ``prev``, ...)
@@ -20,7 +21,7 @@ Card registration: use the alias ``play_spotify`` with a Spotify link or URI as 
       alias: play_spotify
       args: [https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M, Kinderliedjes]
 
-Setup: run ``installation/components/setup_spotify.sh`` (installs librespot and connects the account).
+Setup: run ``installation/components/setup_spotify.sh`` (installs Spotify Soloist and connects the account).
 """
 import functools
 import hashlib
@@ -188,7 +189,7 @@ class SpotifyCtrl:
                 if not match:
                     names = ', '.join(d.get('name', '?') for d in devices) or 'none'
                     raise SpotifyApiError(404, f"Spotify Connect device '{self.device_name}' not found "
-                                               f"(available: {names}). Is librespot running and logged in?")
+                                               f"(available: {names}). Is soloist.service running?")
                 self._device_id = match[0]['id']
                 logger.debug(f"Spotify device '{self.device_name}' has id {self._device_id}")
             return self._device_id
