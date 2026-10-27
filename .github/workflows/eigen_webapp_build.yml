@@ -1,0 +1,44 @@
+name: Bundle Web App (eigen)
+
+# Builds the Web App for every commit on our own branch and attaches it to the
+# release 'eigen-webapp' as webapp-build-<commit>.tar.gz.
+# The installer downloads it from there (see _jukebox_webapp_download_eigen),
+# so the Pi does not have to build it.
+
+on:
+  push:
+    branches:
+      - 'eigen/main'
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: ${{ github.repository_owner == 'WNijhof' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      RELEASE_TAG: eigen-webapp
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Web App
+        id: build-webapp
+        uses: ./.github/actions/build-webapp
+
+      - name: Bundle and upload to release
+        working-directory: ${{ steps.build-webapp.outputs.webapp-root-path }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BUNDLE="webapp-build-${GITHUB_SHA:0:10}.tar.gz"
+          tar -czf "$BUNDLE" build
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --prerelease --title "Web App builds (eigen/main)" \
+              --notes "Prebuilt Web App per commit on eigen/main, used by the installer."
+          fi
+          gh release upload "$RELEASE_TAG" "$BUNDLE" --repo "$GITHUB_REPOSITORY" --clobber

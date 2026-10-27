@@ -121,6 +121,11 @@ get_boot_cmdline_path() {
     echo $(_get_boot_file_path "cmdline.txt")
 }
 
+is_eigen_install() {
+    # GitHub user names are case insensitive
+    [[ "${GIT_USER,,}" == "${EIGEN_USER,,}" && "$GIT_BRANCH" == "$EIGEN_BRANCH" ]]
+}
+
 validate_url() {
     local url=$1
     wget --spider ${url} >/dev/null 2>&1

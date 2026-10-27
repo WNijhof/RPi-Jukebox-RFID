@@ -341,6 +341,11 @@ Disable Pi's on-chip audio (headphone / jack output)? [y/N]"
 }
 
 _option_webapp_devel_build() {
+  # Our own branch has its own prebuilt Web App (with a local build as fallback), no need to ask
+  if is_eigen_install && [[ "$ENABLE_WEBAPP_PROD_DOWNLOAD" == "release-only" && "$CI_RUNNING" != "true" ]]; then
+    log "ENABLE_WEBAPP_PROD_DOWNLOAD=${ENABLE_WEBAPP_PROD_DOWNLOAD} (eigen)"
+    return
+  fi
   # Let's detect if we are on the official release branch
   if [[ "$GIT_BRANCH" != "${GIT_BRANCH_RELEASE}" && "$GIT_BRANCH" != "${GIT_BRANCH_DEVELOP}" ]] || [[ "$GIT_USER" != "$GIT_UPSTREAM_USER" ]] || [[ "$CI_RUNNING" == "true" ]] ; then
     # Unless ENABLE_WEBAPP_PROD_DOWNLOAD is forced to true by user override, do not download a potentially stale build

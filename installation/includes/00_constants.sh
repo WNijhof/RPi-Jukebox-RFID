@@ -13,6 +13,12 @@ GIT_UPSTREAM_USER=${GIT_UPSTREAM_USER:-MiczFlor}
 GIT_BRANCH_RELEASE=${GIT_BRANCH_RELEASE:-future3/main}
 GIT_BRANCH_DEVELOP=${GIT_BRANCH_DEVELOP:-future3/develop}
 
+# Our own fork: the Web App is built by GitHub Actions (eigen_webapp_build.yml)
+# and attached to one release, one bundle per commit, so the Pi does not have to build it
+EIGEN_USER=${EIGEN_USER:-WNijhof}
+EIGEN_BRANCH=${EIGEN_BRANCH:-eigen/main}
+EIGEN_WEBAPP_RELEASE_TAG=${EIGEN_WEBAPP_RELEASE_TAG:-eigen-webapp}
+
 # This message will be displayed at the end of the installation process
 # Functions wanting to have something important printed at the end should APPEND to this variable
 # example:

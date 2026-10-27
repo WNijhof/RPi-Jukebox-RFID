@@ -107,6 +107,25 @@ _jukebox_webapp_download() {
   cd "${INSTALLATION_PATH}" || exit_on_error
 }
 
+# Returns 1 if there is no prebuilt bundle (yet) for this commit
+_jukebox_webapp_download_eigen() {
+  print_lc "  Downloading Web App (eigen)"
+  local git_head_hash=$(git -C "${INSTALLATION_PATH}" rev-parse --verify --quiet HEAD)
+  local tar_filename="webapp-build.tar.gz"
+  local download_url="https://github.com/${EIGEN_USER}/RPi-Jukebox-RFID/releases/download/${EIGEN_WEBAPP_RELEASE_TAG}/webapp-build-${git_head_hash:0:10}.tar.gz"
+
+  if ! validate_url ${download_url} ; then
+    print_lc "    No prebuilt Web App for this commit, building locally"
+    return 1
+  fi
+  log "    DOWNLOAD_URL ${download_url}"
+  cd "${INSTALLATION_PATH}/src/webapp" || exit_on_error
+  download_from_url ${download_url} ${tar_filename}
+  tar -xzf ${tar_filename}
+  rm -f ${tar_filename}
+  cd "${INSTALLATION_PATH}" || exit_on_error
+}
+
 _jukebox_webapp_register_as_system_service_with_nginx() {
   print_lc "  Install and configure nginx"
   sudo apt-get -y update
@@ -159,7 +178,13 @@ _jukebox_webapp_check() {
 }
 
 _run_setup_jukebox_webapp() {
-    if [[ "$ENABLE_WEBAPP_PROD_DOWNLOAD" == true || "$ENABLE_WEBAPP_PROD_DOWNLOAD" == "release-only" ]] ; then
+    if is_eigen_install && [[ "$ENABLE_WEBAPP_PROD_DOWNLOAD" == "release-only" ]] ; then
+        if ! _jukebox_webapp_download_eigen ; then
+            ENABLE_WEBAPP_PROD_DOWNLOAD=false
+            _jukebox_webapp_install_node
+            _jukebox_webapp_build
+        fi
+    elif [[ "$ENABLE_WEBAPP_PROD_DOWNLOAD" == true || "$ENABLE_WEBAPP_PROD_DOWNLOAD" == "release-only" ]] ; then
         _jukebox_webapp_download
     else
         _jukebox_webapp_install_node
