@@ -30,7 +30,8 @@
           "prev_song": "Vorheriger Song",
           "shuffle": "Zufallswiedergabe",
           "repeat": "Wiedergabe wiederholen",
-          "toggle": "Abspielen/Pause umschalten"
+          "toggle": "Abspielen/Pause umschalten",
+          "play_spotify": "Spotify-Playlist/Album abspielen"
         }
       },
       "controls-selector": {
@@ -44,7 +45,8 @@
           "audio": "Audio & Lautstärke",
           "host": "System",
           "timers": "Timer",
-          "synchronisation": "Synchronisation"
+          "synchronisation": "Synchronisation",
+          "spotify": "Spotify"
         }
       },
       "actions": {
@@ -93,6 +95,15 @@
             "label-enable": "Aktivieren",
             "label-disable": "Deaktivieren"
           }
+        },
+        "spotify": {
+          "playlist-label": "Wähle eine deiner Playlists",
+          "playlist-placeholder": "Playlist auswählen",
+          "playlists-unavailable": "Playlists konnten nicht geladen werden. Ist Spotify verbunden (setup_spotify.sh)?",
+          "link-label": "Oder einen Spotify-Link einfügen",
+          "link-helper": "Teilen → Link kopieren in der Spotify-App, z.B. https://open.spotify.com/playlist/...",
+          "name-label": "Name (zum Wiedererkennen der Karte)",
+          "collaborative": "gemeinsam"
         }
       }
     },

@@ -12,6 +12,7 @@ modules:
     jingle.alsawave: jingle.alsawave
     jingle.jinglemp3: jingle.jinglemp3
     player: playermpd
+    spotify: spotify
     cards: rfid.cards
     rfid: rfid.reader
     timers: timers
@@ -19,6 +20,8 @@ modules:
     bluetooth_audio_buttons: controls.bluetooth_audio_buttons
     gpio: gpio.gpioz.plugin
     sync_rfidcards: synchronisation.rfidcards
+    # Eigen uitbreiding muziekbox: battery level of the PiSugar 3 Plus (see eigen/ACCU.md)
+    battmon: battery_monitor.batt_mon_pisugar
   others:
   - misc
 pulse:
@@ -104,6 +107,31 @@ publishing:
 rfid:
   reader_config: ../../shared/settings/rfid.yaml
   card_database: ../../shared/settings/cards.yaml
+battmon:
+  # Eigen uitbreiding muziekbox: PiSugar 3 Plus via pisugar-server. Setup: see eigen/ACCU.md
+  pisugar_host: 127.0.0.1
+  pisugar_port: 8423
+  interval_sec: 10
+  # Below this level (on battery): run warning_action once, e.g. {alias: set_volume, args: 20}
+  warning_level: 10
+  warning_action:
+  all_clear_action:
+  # Below this level (on battery): shut down cleanly
+  shutdown_level: 3
+spotify:
+  # Eigen uitbreiding muziekbox. Setup: see eigen/SPOTIFY.md
+  # Name of the Spotify Connect speaker (must match --name of librespot)
+  device_name: Muziekbox
+  token_file: ../../shared/settings/spotify_token.json
+  resume_file: ../../shared/settings/spotify_resume.json
+  # Default for cards: shuffle on/off
+  shuffle: false
+  # Continue a playlist/album/audiobook where it was left
+  resume: true
+  # Same card again while its content is loaded: play (continue if paused) | toggle | restart | none
+  second_swipe_action: play
+  poll_interval_active_sec: 2
+  poll_interval_idle_sec: 15
 gpioz:
   enable: false
   config_file: ../../shared/settings/gpio.yaml

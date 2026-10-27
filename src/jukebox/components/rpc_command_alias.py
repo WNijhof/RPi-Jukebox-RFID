@@ -75,6 +75,13 @@ cmd_alias_definitions = {
         'method': 'repeat',
         'note': 'Repeat',
         'ignore_card_removal_action': True},
+    # Eigen uitbreiding muziekbox: Spotify
+    'play_spotify': {
+        'title': 'Play a Spotify playlist, album or track triggered by card swipe',
+        'note': "Argument: Spotify share link or URI",
+        'package': 'spotify',
+        'plugin': 'ctrl',
+        'method': 'play_card'},
     'flush_coverart_cache': {
         'package': 'player',
         'plugin': 'ctrl',

@@ -71,6 +71,18 @@ const commands = {
     method: 'play_folder',
     argKeys: ['folder']
   },
+  // Eigen uitbreiding muziekbox: Spotify
+  play_spotify: {
+    _package: 'spotify',
+    plugin: 'ctrl',
+    method: 'play_card',
+    argKeys: ['uri', 'name']
+  },
+  spotifyPlaylists: {
+    _package: 'spotify',
+    plugin: 'ctrl',
+    method: 'list_playlists',
+  },
   play_album: {
     _package: 'player',
     plugin: 'ctrl',

@@ -53,3 +53,20 @@ def get_music_library_path():
     if _MUSIC_LIBRARY_PATH is None:
         _MUSIC_LIBRARY_PATH = MusicLibPath()
     return _MUSIC_LIBRARY_PATH.music_library_path
+
+
+# ---------------------------------------------------------------------------
+# Eigen uitbreiding muziekbox: an external source (e.g. Spotify) can take over the player.
+# While active, the MPD player does not publish its status, so the external source can.
+
+_EXTERNAL_SOURCE_ACTIVE = False
+
+
+def set_external_source_active(active: bool):
+    """Mark that an external source (e.g. Spotify) is the active player"""
+    global _EXTERNAL_SOURCE_ACTIVE
+    _EXTERNAL_SOURCE_ACTIVE = bool(active)
+
+
+def is_external_source_active() -> bool:
+    return _EXTERNAL_SOURCE_ACTIVE

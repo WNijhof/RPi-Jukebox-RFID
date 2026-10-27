@@ -36,6 +36,13 @@ const JUKEBOX_ACTIONS_MAP = {
     }
   },
 
+  // Eigen uitbreiding muziekbox: Spotify
+  spotify: {
+    commands: {
+      play_spotify: {},
+    }
+  },
+
   // Audio & Volume
   audio: {
     commands: {

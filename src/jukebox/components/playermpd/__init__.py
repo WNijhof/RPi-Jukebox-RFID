@@ -277,6 +277,9 @@ class PlayerMPD:
         this method polls the status from mpd and stores the important inforamtion in the music_player_status,
         it will repeat itself in the intervall specified by self.mpd_status_poll_interval
         """
+        # Eigen uitbreiding muziekbox: an external source (Spotify) publishes the player status itself
+        if components.player.is_external_source_active():
+            return
         self.mpd_status.update(self.mpd_retry_with_mutex(self.mpd_client.status))
         self.mpd_status.update(self.mpd_retry_with_mutex(self.mpd_client.currentsong))
 
