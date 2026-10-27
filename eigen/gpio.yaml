@@ -53,7 +53,10 @@ input_devices:
       on_short_press:
         alias: prev_song
       on_long_press:
-        alias: replay
+        # Geen alias beschikbaar voor replay, dus de opdracht voluit
+        package: player
+        plugin: ctrl
+        method: replay
   Volgende:
     type: Button
     kwargs:
