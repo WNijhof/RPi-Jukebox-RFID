@@ -62,7 +62,8 @@ class IdleShutdownTimer:
             name=f"{self.package}.private_timer_idle_shutdown",
             iterations=1,
             wait_seconds_per_iteration=self.idle_timeout,
-            callee=IdleShutdown
+            # Eigen uitbreiding muziekbox: GenericMultiTimerClass passes iterations, IdleShutdown does not take it
+            callee=lambda iterations: IdleShutdown()
         )
         self.private_timer_idle_shutdown.__doc__ = "Timer to shutdown after system is idle for a given time"
         plugin.register(self.private_timer_idle_shutdown, name='private_timer_idle_shutdown', package=self.package)
@@ -133,7 +134,7 @@ class IdleShutdown():
     def __init__(self) -> None:
         self.base_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         logger.debug('Last checks before shutting down')
         if self._has_active_ssh_sessions():
             logger.debug('Active SSH sessions found, will not shutdown now')

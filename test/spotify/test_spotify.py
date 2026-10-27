@@ -231,3 +231,28 @@ def test_playerstatus_has_mpd_format(ctrl):
     assert status['artist'] == 'Kinderkoor'
     assert status['file'] == 'spotify:track:t1'
     assert status['duration'] == '90.000'
+
+
+def test_token_file_changed_on_disk_is_reloaded(tmp_path):
+    from components.spotify import webapi
+    token_file = str(tmp_path / 'token.json')
+    webapi.save_token_file(token_file, 'oude-app', {'refresh_token': 'oud', 'access_token': 'a', 'expires_in': 3600})
+    api = webapi.SpotifyWebApi(token_file)
+    assert api._client_id == 'oude-app'
+
+    # A new login (setup_spotify.sh auth) replaces the file while the Jukebox is running
+    webapi.save_token_file(token_file, 'nieuwe-app', {'refresh_token': 'nieuw', 'access_token': 'b', 'expires_in': 3600})
+    os.utime(token_file, (1, 1))
+    assert api._token() == 'b'
+    assert api._client_id == 'nieuwe-app'
+    assert api.is_authorized
+
+
+def test_token_file_appearing_after_start_is_picked_up(tmp_path):
+    from components.spotify import webapi
+    token_file = str(tmp_path / 'token.json')
+    api = webapi.SpotifyWebApi(token_file)
+    assert not api.is_authorized
+
+    webapi.save_token_file(token_file, 'app', {'refresh_token': 'r', 'access_token': 'a', 'expires_in': 3600})
+    assert api.is_authorized

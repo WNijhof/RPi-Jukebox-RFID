@@ -93,10 +93,13 @@ def save_token_file(token_file: str, client_id: str, token: dict):
         'access_token': token.get('access_token'),
         'expires_at': time.time() + token.get('expires_in', 0),
     }
-    # Create the file with owner-only permissions: it grants access to the Spotify account
-    fd = os.open(token_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    # Create the file with owner-only permissions: it grants access to the Spotify account.
+    # Write to a temporary file and rename, so a process reading the file never sees half of it
+    tmp_file = f"{token_file}.tmp"
+    fd = os.open(tmp_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w') as f:
         json.dump(data, f, indent=2)
+    os.replace(tmp_file, token_file)
 
 
 # ---------------------------------------------------------------------------
@@ -114,13 +117,30 @@ class SpotifyWebApi:
         self._refresh_token = None
         self._access_token = None
         self._expires_at = 0.0
+        self._loaded_mtime = None
         self._load()
 
     @property
     def is_authorized(self) -> bool:
-        return self._refresh_token is not None
+        with self._lock:
+            self._reload_if_changed()
+            return self._refresh_token is not None
+
+    def _file_mtime(self) -> Optional[float]:
+        try:
+            return os.path.getmtime(self.token_file)
+        except OSError:
+            return None
+
+    def _reload_if_changed(self):
+        # Another process may have written the file: a new login (setup_spotify.sh auth) or a refresh,
+        # which rotates the refresh token and makes the one in memory invalid
+        if self._file_mtime() != self._loaded_mtime:
+            logger.info("Spotify token file changed on disk, reloading")
+            self._load()
 
     def _load(self):
+        self._loaded_mtime = self._file_mtime()
         try:
             with open(self.token_file) as f:
                 data = json.load(f)
@@ -152,10 +172,12 @@ class SpotifyWebApi:
         save_token_file(self.token_file, self._client_id,
                         {'refresh_token': self._refresh_token, 'access_token': self._access_token,
                          'expires_in': self._expires_at - time.time()})
+        self._loaded_mtime = self._file_mtime()
         logger.debug("Spotify access token refreshed")
 
     def _token(self) -> str:
         with self._lock:
+            self._reload_if_changed()
             if self._access_token is None or time.time() > self._expires_at - 60:
                 self._refresh()
             return self._access_token
