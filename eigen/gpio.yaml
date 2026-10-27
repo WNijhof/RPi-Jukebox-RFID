@@ -2,10 +2,10 @@
 # Kopieer naar ~/RPi-Jukebox-RFID/shared/settings/gpio.yaml op de Pi
 # en zet in shared/settings/jukebox.yaml:  gpioz: enable: true
 #
-# Pinnummers zijn BCM/GPIO-nummers (niet de fysieke pin!). Zie BOUWHANDLEIDING.md.
+# Pinnummers zijn BCM/GPIO-nummers (niet de fysieke pin!). Zie het pinplan in de bouwdocumentatie.
 # NIET gebruiken: GPIO 18, 19, 20, 21 (I2S-versterker), 8, 9, 10, 11, 24, 25 (RC522)
 # en 2, 3 (I2C: de PiSugar-accu leest daarover het batterijniveau uit).
-# Aan/uit gaat via de knop van de PiSugar, zie ACCU.md.
+# Aan/uit gaat via de knop van de PiSugar (zie bouwdocumentatie).
 pin_factory:
   type: rpigpio.RPiGPIOFactory
 output_devices:

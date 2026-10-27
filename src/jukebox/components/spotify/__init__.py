@@ -20,7 +20,7 @@ Card registration: use the alias ``play_spotify`` with a Spotify link or URI as 
       alias: play_spotify
       args: [https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M, Kinderliedjes]
 
-Setup: see ``eigen/SPOTIFY.md``
+Setup: run ``installation/components/setup_spotify.sh`` (installs librespot and connects the account).
 """
 import functools
 import hashlib

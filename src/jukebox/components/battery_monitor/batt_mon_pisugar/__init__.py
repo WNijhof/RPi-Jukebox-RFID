@@ -18,7 +18,7 @@ Configuration in ``jukebox.yaml``::
       warning_action:         # optional RPC command, e.g. {alias: set_volume, args: 20}
       all_clear_action:
 
-Setup: see ``eigen/ACCU.md``
+Setup: install pisugar-server (https://github.com/PiSugar/pisugar-power-manager-rs) and enable I2C.
 """
 import logging
 import socket

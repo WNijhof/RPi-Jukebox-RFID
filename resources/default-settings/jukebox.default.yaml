@@ -20,7 +20,7 @@ modules:
     bluetooth_audio_buttons: controls.bluetooth_audio_buttons
     gpio: gpio.gpioz.plugin
     sync_rfidcards: synchronisation.rfidcards
-    # Eigen uitbreiding muziekbox: battery level of the PiSugar 3 Plus (see eigen/ACCU.md)
+    # Eigen uitbreiding muziekbox: battery level of the PiSugar 3 Plus
     battmon: battery_monitor.batt_mon_pisugar
   others:
   - misc
@@ -108,7 +108,7 @@ rfid:
   reader_config: ../../shared/settings/rfid.yaml
   card_database: ../../shared/settings/cards.yaml
 battmon:
-  # Eigen uitbreiding muziekbox: PiSugar 3 Plus via pisugar-server. Setup: see eigen/ACCU.md
+  # Eigen uitbreiding muziekbox: PiSugar 3 Plus via pisugar-server
   pisugar_host: 127.0.0.1
   pisugar_port: 8423
   interval_sec: 10
@@ -119,7 +119,7 @@ battmon:
   # Below this level (on battery): shut down cleanly
   shutdown_level: 3
 spotify:
-  # Eigen uitbreiding muziekbox. Setup: see eigen/SPOTIFY.md
+  # Eigen uitbreiding muziekbox
   # Name of the Spotify Connect speaker (must match --name of librespot)
   device_name: Muziekbox
   token_file: ../../shared/settings/spotify_token.json
