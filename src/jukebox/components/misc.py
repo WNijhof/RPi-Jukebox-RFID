@@ -93,6 +93,13 @@ def get_git_state():
     return get_jukebox_daemon().git_state
 
 
+# Eigen uitbreiding muziekbox: shown in the Web App, to see if an update has arrived
+@plugin.register
+def get_release():
+    """Return the installed release"""
+    return jukebox.utils.get_git_describe()
+
+
 @plugin.register
 def empty_rpc_call(msg: str = ''):
     """This function does nothing.

@@ -310,6 +310,9 @@
         "button-title": "Lese die IP Adresse vor",
         "loading-error": "Die IP Adresse konnte nicht geladen werden."
       },
+      "release": {
+        "label": "Muziekbox-Version"
+      },
       "version": {
         "label": "Jukebox Core Version"
       }

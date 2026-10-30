@@ -294,6 +294,11 @@ const commands = {
   },
 
   // Misc
+  // Eigen uitbreiding muziekbox: geinstalleerde release
+  getRelease: {
+    _package: 'misc',
+    plugin: 'get_release',
+  },
   getAppSettings: {
     _package: 'misc',
     plugin: 'get_app_settings'

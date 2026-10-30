@@ -278,6 +278,20 @@ def generate_cmd_alias_reference(stream):
     print('*' * width, file=stream)
 
 
+def get_git_describe():
+    """Return the nearest tag of the current commit, which is the installed release on our own branch"""
+    describe = "No git describe info"
+    try:
+        sub = subprocess.run("git describe --tag --dirty='-dirty'",
+                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                             check=True)
+        if sub.returncode == 0:
+            describe = sub.stdout.decode('utf-8').strip()
+    except Exception as e:
+        log.error(f"{e.__class__.__name__}: {e}")
+    return describe
+
+
 def get_git_state():
     """Return git state information for the current branch"""
 
@@ -290,14 +304,4 @@ def get_git_state():
     except Exception as e:
         log.error(f"{e.__class__.__name__}: {e}")
 
-    describe = "No git describe info"
-    try:
-        sub = subprocess.run("git describe --tag --dirty='-dirty'",
-                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                             check=True)
-        if sub.returncode == 0:
-            describe = sub.stdout.decode('utf-8').strip()
-    except Exception as e:
-        log.error(f"{e.__class__.__name__}: {e}")
-
-    return f"{gitlog} [{describe}]"
+    return f"{gitlog} [{get_git_describe()}]"

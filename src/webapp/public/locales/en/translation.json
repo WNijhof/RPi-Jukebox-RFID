@@ -310,6 +310,9 @@
         "button-title": "Say my IP address",
         "loading-error": "IP address could not be loaded."
       },
+      "release": {
+        "label": "Muziekbox version"
+      },
       "version": {
         "label": "Jukebox Core Version"
       }
