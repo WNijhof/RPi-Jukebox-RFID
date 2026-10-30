@@ -105,7 +105,7 @@ class ChargeStateCallbacks(CallbackHandler):
         .. py:function:: func(state: str)
             :noindex:
 
-        :param state: 'discharging', 'charging' or 'full'
+        :param state: 'discharging', 'low', 'charging' or 'full'
         """
         super().register(func)
 
@@ -330,7 +330,7 @@ def flash(name, on_time=1, off_time=1, n=1, *, fade_in_time=0, fade_out_time=0, 
 def set_charge_state(state: str):
     """Show the charge state of the battery on the output devices
 
-    :param state: 'discharging', 'charging' or 'full'
+    :param state: 'discharging', 'low', 'charging' or 'full'
     """
     charge_state_callbacks.run_callbacks(state)
 

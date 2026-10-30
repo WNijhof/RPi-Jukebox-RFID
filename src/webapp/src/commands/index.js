@@ -282,6 +282,13 @@ const commands = {
     argKeys: ['option'],
   },
 
+  // Eigen uitbreiding muziekbox: gebruik per acculading
+  getBatteryCycles: {
+    _package: 'battmon',
+    plugin: 'batt_mon',
+    method: 'get_cycles',
+  },
+
   // Eigen uitbreiding muziekbox: knoppen aan/uit
   getInputs: {
     _package: 'gpio',

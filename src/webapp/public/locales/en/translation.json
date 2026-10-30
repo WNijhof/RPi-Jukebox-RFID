@@ -267,6 +267,13 @@
         "cancel": "Cancel"
       }
     },
+    "battery-cycles": {
+      "title": "Battery use per charge",
+      "description": "Time the box was on and time music played, in hours:minutes.",
+      "none": "No data yet. Tracking starts when the box runs on battery.",
+      "current": "Now",
+      "usage": "On for {{on}}, music for {{played}}"
+    },
     "buttons": {
       "title": "Buttons",
       "description": "A button that is switched off does nothing when pressed. The power button always works.",

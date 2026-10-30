@@ -13,10 +13,13 @@ Configuration in ``jukebox.yaml``::
       named:
         battmon: battery_monitor.batt_mon_pisugar
     battmon:
-      warning_level: 10       # % - call warning_action once when below (and not charging)
+      warning_level: 10       # % - call warning_action once when below (and not charging), the status LED blinks fast
+      sound_level: 7          # % - play low_sound once when below (and not charging)
+      low_sound: ../../resources/audio/lowbatterysound.wav
       shutdown_level: 3       # % - shut down cleanly when below (and not charging)
       full_level: 98          # % - counts as full on the status LED (the LED blinks while charging)
-      warning_action:        # optional RPC command, e.g. {alias: set_volume, args: 20}
+      cycles_file: ../../shared/settings/battery_cycles.json   # history of battery use per charge
+      warning_action:       # optional RPC command, e.g. {alias: set_volume, args: 20}
       all_clear_action:
 
 Setup: install pisugar-server (https://github.com/PiSugar/pisugar-power-manager-rs) and enable I2C.
@@ -29,6 +32,7 @@ import jukebox.plugs as plugs
 import jukebox.publishing
 import jukebox.multitimer as multitimer
 import jukebox.utils as utils
+from components.battery_monitor.batt_mon_pisugar.cycles import BatteryCycles
 
 logger = logging.getLogger('jb.battmon')
 cfg = jukebox.cfghandler.get_handler('jukebox')
@@ -44,11 +48,16 @@ class BattmonPiSugar:
         self.warning_level = cfg.setndefault('battmon', 'warning_level', value=10)
         self.shutdown_level = cfg.setndefault('battmon', 'shutdown_level', value=3)
         self.full_level = cfg.setndefault('battmon', 'full_level', value=98)
+        self.sound_level = cfg.setndefault('battmon', 'sound_level', value=7)
+        self.low_sound = cfg.setndefault('battmon', 'low_sound', value='../../resources/audio/lowbatterysound.wav')
+        self.cycles = BatteryCycles(cfg.setndefault('battmon', 'cycles_file',
+                                                    value='../../shared/settings/battery_cycles.json'))
         self.warning_action = cfg.setndefault('battmon', 'warning_action', value=None)
         self.all_clear_action = cfg.setndefault('battmon', 'all_clear_action', value=None)
         self.batt_status = {'soc': 0, 'charging': 0, 'voltage': 0}
         self.charge_state = None
         self._warned = False
+        self._sound_played = False
         self._reachable = True
 
         self.status_thread = multitimer.GenericEndlessTimerClass('batt_mon.timer_status',
@@ -83,10 +92,30 @@ class BattmonPiSugar:
     def get_batt_status(self):
         return self.batt_status
 
+    @plugs.tag
+    def get_cycles(self):
+        """Return how long the box ran on each charge and how much of that time music played"""
+        return self.cycles.get()
+
+    def update_cycles(self, status: dict):
+        player_status = plugs.call_ignore_errors('player', 'ctrl', 'playerstatus') or {}
+        self.cycles.update(status['soc'], not status['charging'], player_status.get('state') == 'play', self.interval)
+
+    def play_low_sound(self, status: dict):
+        """Warn once that the box will switch off soon"""
+        soc, on_battery = status['soc'], not status['charging']
+        if not on_battery or soc > self.sound_level + 5:
+            self._sound_played = False
+        elif self.shutdown_level < soc <= self.sound_level and not self._sound_played:
+            self._sound_played = True
+            plugs.call_ignore_errors('jingle', 'play', args=[self.low_sound], as_thread=True, thread_name='LowBatteryJingle')
+
     def update_charge_state(self, status: dict):
-        """Report changes to the status LED. Margin on 'full': the level dips a little before the charger tops up"""
+        """Report changes to the status LED. Margins on 'low' and 'full': the level does not move in one direction only"""
         if not status['charging']:
-            state = 'discharging'
+            is_low = status['soc'] <= self.warning_level or (self.charge_state == 'low'
+                                                             and status['soc'] <= self.warning_level + 5)
+            state = 'low' if is_low else 'discharging'
         elif status['soc'] >= self.full_level or (self.charge_state == 'full' and status['soc'] >= self.full_level - 5):
             state = 'full'
         else:
@@ -126,6 +155,8 @@ class BattmonPiSugar:
         logger.debug(f"SOC: {soc}%, Batt Voltage: {status['voltage']}mV, charging: {status['charging']}")
         self.batt_status.update(status)
         self.update_charge_state(status)
+        self.play_low_sound(status)
+        self.update_cycles(status)
         jukebox.publishing.get_publisher().send('batt_status', self.batt_status)
 
 

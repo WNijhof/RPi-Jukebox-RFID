@@ -120,6 +120,11 @@ battmon:
   shutdown_level: 3
   # From this level (on the charger): the status LED stops blinking and stays on
   full_level: 98
+  # Below this level (on battery): play low_sound once, just before the box switches off
+  sound_level: 7
+  low_sound: ../../resources/audio/lowbatterysound.wav
+  # History of how long the box runs per charge, shown in the Web App
+  cycles_file: ../../shared/settings/battery_cycles.json
 spotify:
   # Eigen uitbreiding muziekbox
   # Name of the Spotify Connect speaker (must match --device-name of Soloist, see setup_spotify.sh)

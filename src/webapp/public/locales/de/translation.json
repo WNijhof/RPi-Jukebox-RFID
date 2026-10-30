@@ -267,6 +267,13 @@
         "cancel": "Abbrechen"
       }
     },
+    "battery-cycles": {
+      "title": "Akkunutzung pro Ladung",
+      "description": "Zeit, in der die Box an war und Musik lief, in Stunden:Minuten.",
+      "none": "Noch keine Daten. Die Aufzeichnung beginnt im Akkubetrieb.",
+      "current": "Jetzt",
+      "usage": "{{on}} an, {{played}} Musik"
+    },
     "buttons": {
       "title": "Tasten",
       "description": "Eine ausgeschaltete Taste bewirkt beim Drücken nichts. Die Ein-Taste funktioniert immer.",

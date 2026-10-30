@@ -75,7 +75,7 @@ def register_rfid_callback(device):
 def register_status_led_callback(device):
     """
     Turn LED on when Jukebox App has started. Eigen uitbreiding muziekbox: blink while the battery is
-    charging, the LED stays on again as soon as the battery is full
+    charging, the LED stays on again as soon as the battery is full. Blink fast when the battery is almost empty
 
     Compatible devices:
 
@@ -95,6 +95,8 @@ def register_status_led_callback(device):
     def set_charge_led(state):
         if state == 'charging':
             device.blink(on_time=1, off_time=1)
+        elif state == 'low':
+            device.blink(on_time=0.2, off_time=0.2)
         else:
             device.on()
 
