@@ -267,6 +267,19 @@
         "cancel": "Abbrechen"
       }
     },
+    "buttons": {
+      "title": "Tasten",
+      "description": "Eine ausgeschaltete Taste bewirkt beim Drücken nichts. Die Ein-Taste funktioniert immer.",
+      "none": "Keine Tasten konfiguriert.",
+      "load-failed": "Tasten konnten nicht geladen werden.",
+      "names": {
+        "PlayPauze": "Abspielen / Pause",
+        "Vorige": "Zurück",
+        "Volgende": "Weiter",
+        "VolumeOmlaag": "Leiser",
+        "VolumeOmhoog": "Lauter"
+      }
+    },
     "secondswipe": {
       "title": "Erneute Aktivierung (Second Swipe)",
       "description": "Aktion, wenn dieselbe Karte ein weiteres Mal aktiviert wird",

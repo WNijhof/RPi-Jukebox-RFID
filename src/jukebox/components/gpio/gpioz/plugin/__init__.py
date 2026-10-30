@@ -215,6 +215,7 @@ def build_input_device(name: str, config):
         return
     else:
         device.set_rpc_actions(config.get('actions'))
+        device.enabled = name not in cfg_main.getn('gpioz', 'disabled_inputs', default=[])
 
     input_devices[name] = device
 
@@ -294,6 +295,30 @@ def flash(name, on_time=1, off_time=1, n=1, *, fade_in_time=0, fade_out_time=0, 
     """
     get_output(name).flash(on_time=on_time, off_time=off_time, n=n, fade_in_time=fade_in_time, fade_out_time=fade_out_time,
                            tone=tone, color=color)
+
+
+# Eigen uitbreiding muziekbox: switch buttons on and off from the Web App
+@plugin.register
+def get_inputs():
+    """List all input devices and whether they are enabled"""
+    return [{'name': name, 'enabled': device.enabled} for name, device in input_devices.items()]
+
+
+@plugin.register
+def set_input_enabled(name: str, enabled: bool):
+    """Enable or disable an input device. Saved right away, as the box may lose power before a clean shutdown
+
+    :param name: The alias name input device instance
+
+    :param enabled: :data:`False` if the device should no longer run its actions
+    """
+    if name not in input_devices.keys():
+        raise KeyError(f"No such input device with name '{name}'")
+    input_devices[name].enabled = enabled
+    cfg_main.setn('gpioz', 'disabled_inputs',
+                  value=[n for n, device in input_devices.items() if not device.enabled])
+    cfg_main.save()
+    return get_inputs()
 
 
 # ---------------------------------------------------

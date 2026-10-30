@@ -267,6 +267,19 @@
         "cancel": "Cancel"
       }
     },
+    "buttons": {
+      "title": "Buttons",
+      "description": "A button that is switched off does nothing when pressed. The power button always works.",
+      "none": "No buttons configured.",
+      "load-failed": "Buttons could not be loaded.",
+      "names": {
+        "PlayPauze": "Play / Pause",
+        "Vorige": "Previous",
+        "Volgende": "Next",
+        "VolumeOmlaag": "Volume down",
+        "VolumeOmhoog": "Volume up"
+      }
+    },
     "secondswipe": {
       "title": "Second Swipe",
       "description": "Second action after the same card swiped again",

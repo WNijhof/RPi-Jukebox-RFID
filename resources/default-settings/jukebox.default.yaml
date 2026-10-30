@@ -135,6 +135,8 @@ spotify:
 gpioz:
   enable: false
   config_file: ../../shared/settings/gpio.yaml
+  # Eigen uitbreiding muziekbox: names of the buttons switched off in the Web App
+  disabled_inputs: []
 timers:
   idle_shutdown:
     # If you want the box to shutdown on inactivity automatically, configure timeout_sec with a number of seconds (at least 60).

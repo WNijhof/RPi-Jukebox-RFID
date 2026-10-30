@@ -4,6 +4,18 @@
   - [Manually upgrade to the latest version (not recommended)](#manually-upgrade-to-the-latest-version-not-recommended)
 - [Migration Path from Version 2](#migration-path-from-version-2)
 
+## Automatic update (eigen/main)
+
+Boxes on our own branch install every new [GitHub release](https://github.com/WNijhof/RPi-Jukebox-RFID/releases) by themselves. Enable this once per box:
+
+```bash
+~/RPi-Jukebox-RFID/installation/components/update_jukebox.sh install
+```
+
+To publish an update, create a normal release (not a pre-release) on a commit of `eigen/main`. The box checks every 10 minutes while it is on, waits while music is playing and until the Web App bundle of that commit is built, and restores the old version if the Jukebox does not start. See the result with `journalctl --user -u jukebox-update`.
+
+Changes to systemd services, the installer or the files in `shared/settings` are not applied automatically.
+
 ## Updating your Jukebox Version 3
 
 Currently there is no functionality to update an existing installation to the next release.

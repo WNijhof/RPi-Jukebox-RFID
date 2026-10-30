@@ -282,6 +282,17 @@ const commands = {
     argKeys: ['option'],
   },
 
+  // Eigen uitbreiding muziekbox: knoppen aan/uit
+  getInputs: {
+    _package: 'gpio',
+    plugin: 'get_inputs',
+  },
+  setInputEnabled: {
+    _package: 'gpio',
+    plugin: 'set_input_enabled',
+    argKeys: ['name', 'enabled'],
+  },
+
   // Misc
   getAppSettings: {
     _package: 'misc',

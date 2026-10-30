@@ -38,10 +38,18 @@ class NameMixin(ABC):
         # Warn if unbound function appear in _decode_rpc_action
         # e.g. for button where you expect all action functions to be assigned
         self._warn_on_no_func = True
+        # Eigen uitbreiding muziekbox: a disabled device stays connected, but runs no actions
+        self.enabled = True
 
     @property
     def name(self):
         return self._name
+
+    def _only_when_enabled(self, func):
+        def guarded():
+            if self.enabled:
+                func()
+        return guarded
 
     def _decode_rpc_action(self, action_name, action_config):
         if action_config is None:
@@ -68,7 +76,7 @@ class NameMixin(ABC):
                                                    'kwargs': None,
                                                    'args': msg}, dereference=True, logger=logger)
 
-        return func
+        return self._only_when_enabled(func)
 
     @abstractmethod
     def set_rpc_actions(self, action_config) -> None:

@@ -1,0 +1,11 @@
+[Unit]
+# Eigen uitbreiding muziekbox: regular check for a new GitHub release.
+# Often, because the box is only on while it is being used
+Description=Check for a new Muziekbox release
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target

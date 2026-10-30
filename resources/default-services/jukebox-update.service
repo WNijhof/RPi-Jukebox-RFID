@@ -1,0 +1,9 @@
+[Unit]
+# Eigen uitbreiding muziekbox: install the latest GitHub release while nothing is playing
+Description=Update Muziekbox to the latest release
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%%PROJECT_ROOT%%/installation/components/update_jukebox.sh
