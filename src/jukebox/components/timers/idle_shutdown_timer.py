@@ -140,6 +140,11 @@ class IdleShutdown():
             logger.debug('Active SSH sessions found, will not shutdown now')
             plugin.call_ignore_errors('timers', 'private_timer_idle_shutdown', 'set_timeout', args=[int(EXTEND_IDLE_TIMEOUT)])
             return
+        # Eigen uitbreiding muziekbox: stay on while charging, the status LED shows when the battery is full
+        if self._is_charging():
+            logger.debug('Charging, will not shutdown now')
+            plugin.call_ignore_errors('timers', 'private_timer_idle_shutdown', 'set_timeout', args=[int(EXTEND_IDLE_TIMEOUT)])
+            return
         # if self._has_changed_files():
         #     logger.debug('Changes files found, will not shutdown now')
         #     plugin.call_ignore_errors(
@@ -153,6 +158,12 @@ class IdleShutdown():
         plugin.call_ignore_errors('timers', 'private_timer_idle_check', 'cancel')
         plugin.call_ignore_errors('timers', 'private_timer_idle_shutdown', 'cancel')
         plugin.call_ignore_errors('host', 'shutdown')
+
+    @staticmethod
+    def _is_charging():
+        if not plugin.exists('battmon', 'batt_mon'):
+            return False
+        return bool(plugin.call('battmon', 'batt_mon', 'get_batt_status')['charging'])
 
     @staticmethod
     def _has_active_ssh_sessions():

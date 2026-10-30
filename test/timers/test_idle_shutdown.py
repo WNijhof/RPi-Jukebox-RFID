@@ -29,3 +29,23 @@ def test_idle_shutdown_runs_through_multitimer():
         timer.start()
         assert called.wait(timeout=5), "IdleShutdown was not called by the timer"
         timer.cancel()
+
+
+def test_no_idle_shutdown_while_charging():
+    shutdown = idle.IdleShutdown()
+    with mock.patch.object(idle.IdleShutdown, '_has_active_ssh_sessions', return_value=False), \
+         mock.patch.object(idle.plugin, 'exists', return_value=True), \
+         mock.patch.object(idle.plugin, 'call', return_value={'charging': 1}), \
+         mock.patch.object(idle.plugin, 'call_ignore_errors') as call:
+        shutdown()
+    assert mock.call('host', 'shutdown') not in call.call_args_list
+    call.assert_called_once_with('timers', 'private_timer_idle_shutdown', 'set_timeout', args=[idle.EXTEND_IDLE_TIMEOUT])
+
+
+def test_idle_shutdown_without_battery_monitor():
+    shutdown = idle.IdleShutdown()
+    with mock.patch.object(idle.IdleShutdown, '_has_active_ssh_sessions', return_value=False), \
+         mock.patch.object(idle.plugin, 'exists', return_value=False), \
+         mock.patch.object(idle.plugin, 'call_ignore_errors') as call:
+        shutdown()
+    call.assert_any_call('host', 'shutdown')

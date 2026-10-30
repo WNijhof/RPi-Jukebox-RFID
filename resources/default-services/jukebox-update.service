@@ -7,3 +7,6 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=%%PROJECT_ROOT%%/installation/components/update_jukebox.sh
+# The journal on the box is volatile: keep the result after a shutdown
+StandardOutput=append:%%PROJECT_ROOT%%/shared/logs/update.log
+StandardError=append:%%PROJECT_ROOT%%/shared/logs/update.log

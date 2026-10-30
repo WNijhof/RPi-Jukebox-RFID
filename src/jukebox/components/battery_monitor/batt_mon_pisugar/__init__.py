@@ -15,7 +15,8 @@ Configuration in ``jukebox.yaml``::
     battmon:
       warning_level: 10       # % - call warning_action once when below (and not charging)
       shutdown_level: 3       # % - shut down cleanly when below (and not charging)
-      warning_action:         # optional RPC command, e.g. {alias: set_volume, args: 20}
+      full_level: 98          # % - counts as full on the status LED (the LED blinks while charging)
+      warning_action:        # optional RPC command, e.g. {alias: set_volume, args: 20}
       all_clear_action:
 
 Setup: install pisugar-server (https://github.com/PiSugar/pisugar-power-manager-rs) and enable I2C.
@@ -42,9 +43,11 @@ class BattmonPiSugar:
         self.interval = cfg.setndefault('battmon', 'interval_sec', value=10)
         self.warning_level = cfg.setndefault('battmon', 'warning_level', value=10)
         self.shutdown_level = cfg.setndefault('battmon', 'shutdown_level', value=3)
+        self.full_level = cfg.setndefault('battmon', 'full_level', value=98)
         self.warning_action = cfg.setndefault('battmon', 'warning_action', value=None)
         self.all_clear_action = cfg.setndefault('battmon', 'all_clear_action', value=None)
         self.batt_status = {'soc': 0, 'charging': 0, 'voltage': 0}
+        self.charge_state = None
         self._warned = False
         self._reachable = True
 
@@ -80,6 +83,19 @@ class BattmonPiSugar:
     def get_batt_status(self):
         return self.batt_status
 
+    def update_charge_state(self, status: dict):
+        """Report changes to the status LED. Margin on 'full': the level dips a little before the charger tops up"""
+        if not status['charging']:
+            state = 'discharging'
+        elif status['soc'] >= self.full_level or (self.charge_state == 'full' and status['soc'] >= self.full_level - 5):
+            state = 'full'
+        else:
+            state = 'charging'
+        if state != self.charge_state:
+            logger.info(f"Battery {state}: {status['soc']}%")
+            self.charge_state = state
+            plugs.call_ignore_errors('gpio', 'set_charge_state', args=[state])
+
     def publish_status(self):
         try:
             status = self.read()
@@ -109,6 +125,7 @@ class BattmonPiSugar:
 
         logger.debug(f"SOC: {soc}%, Batt Voltage: {status['voltage']}mV, charging: {status['charging']}")
         self.batt_status.update(status)
+        self.update_charge_state(status)
         jukebox.publishing.get_publisher().send('batt_status', self.batt_status)
 
 

@@ -118,6 +118,8 @@ battmon:
   all_clear_action:
   # Below this level (on battery): shut down cleanly
   shutdown_level: 3
+  # From this level (on the charger): the status LED stops blinking and stays on
+  full_level: 98
 spotify:
   # Eigen uitbreiding muziekbox
   # Name of the Spotify Connect speaker (must match --device-name of Soloist, see setup_spotify.sh)

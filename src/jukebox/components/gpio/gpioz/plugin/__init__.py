@@ -90,6 +90,35 @@ class ServiceIsRunningCallbacks(CallbackHandler):
 service_is_running_callbacks = ServiceIsRunningCallbacks('service_running_callbacks', logger)
 
 
+# Eigen uitbreiding muziekbox: the battery monitor reports charging through set_charge_state
+class ChargeStateCallbacks(CallbackHandler):
+    """
+    Callbacks are executed when the charge state of the battery changes
+    """
+
+    def register(self, func: Callable[[str], None]):
+        """
+        Add a new callback function :attr:`func`.
+
+        Callback signature is
+
+        .. py:function:: func(state: str)
+            :noindex:
+
+        :param state: 'discharging', 'charging' or 'full'
+        """
+        super().register(func)
+
+    def run_callbacks(self, state: str):
+        """:meta private:"""
+        super().run_callbacks(state)
+
+
+#: Callback handler instance for charge state events.
+#: See :class:`ChargeStateCallbacks`
+charge_state_callbacks = ChargeStateCallbacks('charge_state_callbacks', logger)
+
+
 # ---------------------------------------------------
 # Pin Factory Creation
 # ---------------------------------------------------
@@ -295,6 +324,15 @@ def flash(name, on_time=1, off_time=1, n=1, *, fade_in_time=0, fade_out_time=0, 
     """
     get_output(name).flash(on_time=on_time, off_time=off_time, n=n, fade_in_time=fade_in_time, fade_out_time=fade_out_time,
                            tone=tone, color=color)
+
+
+@plugin.register
+def set_charge_state(state: str):
+    """Show the charge state of the battery on the output devices
+
+    :param state: 'discharging', 'charging' or 'full'
+    """
+    charge_state_callbacks.run_callbacks(state)
 
 
 # Eigen uitbreiding muziekbox: switch buttons on and off from the Web App

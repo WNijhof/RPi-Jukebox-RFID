@@ -74,15 +74,39 @@ def test_shuts_down_when_empty(battmon):
     with mock.patch.dict(ANSWERS, {'battery': '2.0'}), \
          mock.patch.object(pisugar.plugs, 'call_ignore_errors') as call:
         battmon.publish_status()
-    call.assert_called_once_with('host', 'shutdown')
+    call.assert_any_call('host', 'shutdown')
 
 
 def test_no_shutdown_while_charging(battmon):
     with mock.patch.dict(ANSWERS, {'battery': '2.0', 'battery_power_plugged': 'true'}), \
          mock.patch.object(pisugar.plugs, 'call_ignore_errors') as call:
         battmon.publish_status()
-    call.assert_not_called()
+    assert mock.call('host', 'shutdown') not in call.call_args_list
     assert battmon.batt_status['charging'] == 1
+
+
+@pytest.mark.parametrize('soc, expected', [(50, 'charging'), (97, 'charging'), (98, 'full'), (100, 'full')])
+def test_charge_state(battmon, soc, expected):
+    with mock.patch.object(pisugar.plugs, 'call_ignore_errors') as call:
+        battmon.update_charge_state({'soc': soc, 'charging': 1})
+    call.assert_called_once_with('gpio', 'set_charge_state', args=[expected])
+
+
+def test_charge_state_reports_changes_only(battmon):
+    with mock.patch.object(pisugar.plugs, 'call_ignore_errors') as call:
+        for soc in (50, 51, 98, 99):
+            battmon.update_charge_state({'soc': soc, 'charging': 1})
+        battmon.update_charge_state({'soc': 99, 'charging': 0})
+    assert [c.kwargs['args'][0] for c in call.call_args_list] == ['charging', 'full', 'discharging']
+
+
+def test_full_survives_small_dip(battmon):
+    with mock.patch.object(pisugar.plugs, 'call_ignore_errors'):
+        battmon.update_charge_state({'soc': 100, 'charging': 1})
+        battmon.update_charge_state({'soc': 94, 'charging': 1})
+        assert battmon.charge_state == 'full'
+        battmon.update_charge_state({'soc': 92, 'charging': 1})
+        assert battmon.charge_state == 'charging'
 
 
 def test_unreachable_server_is_quiet(battmon):
