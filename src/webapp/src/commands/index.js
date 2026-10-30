@@ -149,6 +149,17 @@ const commands = {
     plugin: 'ctrl',
     method: 'set_soft_max_volume',
   },
+  // Eigen uitbreiding muziekbox: equalizer
+  getEqualizer: {
+    _package: 'volume',
+    plugin: 'ctrl',
+    method: 'get_equalizer',
+  },
+  setEqualizer: {
+    _package: 'volume',
+    plugin: 'ctrl',
+    method: 'set_equalizer',
+  },
   change_volume: {
     _package: 'volume',
     plugin: 'ctrl',

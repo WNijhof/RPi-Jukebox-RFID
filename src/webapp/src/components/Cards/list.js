@@ -28,6 +28,10 @@ const CardsList = ({ cardsList }) => {
       return <Link ref={ref} to={location} {...props} />
     });
 
+    // Eigen uitbreiding muziekbox: de naam van een Spotify-kaart is de hoofdregel
+    const { from_alias: alias, action } = cardsList[cardId];
+    const name = alias === 'play_spotify' ? action.args?.[1] : null;
+
     const description = cardsList[cardId].from_alias
       ? reject(
           isNil,
@@ -48,8 +52,8 @@ const CardsList = ({ cardsList }) => {
           </Avatar>
         </ListItemAvatar>
         <ListItemText
-          primary={cardId}
-          secondary={description}
+          primary={name || cardId}
+          secondary={name ? cardId : description}
         />
       </ListItem>
     );

@@ -333,6 +333,22 @@
       },
       "volume": {
         "max-volume": "Maximum Volume"
+      },
+      "equalizer": {
+        "title": "Equalizer",
+        "description": "Bass on the left, treble on the right, in dB. Raising a band a lot can cause distortion. Music pauses for a moment on each change.",
+        "presets": {
+          "standard": "Standard",
+          "flat": "Flat",
+          "warm": "Warm",
+          "bright": "Bright",
+          "voice": "Voice",
+          "v-shape": "Bass + treble",
+          "loud": "Loud"
+        },
+        "none": "No equalizer configured.",
+        "load-failed": "The equalizer could not be loaded.",
+        "save-failed": "The change could not be saved."
       }
     },
     "systemcontrols": {

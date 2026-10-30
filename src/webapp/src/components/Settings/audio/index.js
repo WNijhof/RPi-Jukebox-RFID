@@ -8,6 +8,7 @@ import {
   Divider,
 } from '@mui/material';
 
+import Equalizer from './equalizer';
 import MaxVolume from './max-volume';
 import Outputs from './outputs';
 
@@ -24,6 +25,10 @@ const SettingsAudio = () => {
       <Divider />
       <CardContent>
         <MaxVolume />
+      </CardContent>
+      <Divider />
+      <CardContent>
+        <Equalizer />
       </CardContent>
     </Card>
   );

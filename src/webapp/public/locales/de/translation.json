@@ -331,6 +331,22 @@
       },
       "volume": {
         "max-volume": "Maximale Lautstärke"
+      },
+      "equalizer": {
+        "title": "Equalizer",
+        "description": "Bass links, Höhen rechts, in dB. Starkes Anheben kann zu Verzerrungen führen. Die Musik setzt bei jeder Änderung kurz aus.",
+        "presets": {
+          "standard": "Standard",
+          "flat": "Neutral",
+          "warm": "Warm",
+          "bright": "Hell",
+          "voice": "Sprache",
+          "v-shape": "Bass + Höhen",
+          "loud": "Laut"
+        },
+        "none": "Kein Equalizer eingerichtet.",
+        "load-failed": "Der Equalizer konnte nicht geladen werden.",
+        "save-failed": "Die Änderung konnte nicht gespeichert werden."
       }
     },
     "systemcontrols": {

@@ -70,6 +70,7 @@ import jukebox.plugs as plugin
 import jukebox.publishing as publishing
 from typing import (List, Optional, Callable)
 from jukebox.callingback import CallbackHandler
+from components.volume import equalizer
 
 logger = logging.getLogger('jb.pulse')
 logger_event = logging.getLogger('jb.pulse.event')
@@ -564,6 +565,63 @@ class PulseVolumeControl:
     def get_soft_max_volume(self):
         """Return the maximum volume limit for the currently active output"""
         return self._soft_max_volume
+
+    def _get_equalizer_sink(self, pulse_inst: pulsectl.Pulse):
+        for sink in pulse_inst.sink_list():
+            if sink.driver == 'module-ladspa-sink.c' and 'Eq10X2' in sink.description:
+                return sink
+        return None
+
+    def _get_equalizer_module(self, pulse_inst: pulsectl.Pulse, sink):
+        return next(x for x in pulse_inst.module_list() if x.index == sink.owner_module)
+
+    def _reload_equalizer(self, pulse_inst: pulsectl.Pulse, sink, argument: str):
+        # Streams fall back to the master sink when the module is unloaded, move them back
+        stream_list = [x.index for x in pulse_inst.sink_input_list() if x.sink == sink.index]
+        is_default = pulse_inst.server_info().default_sink_name == sink.name
+        pulse_inst.module_unload(sink.owner_module)
+        # The unload is deferred: while the old sink exists, a new one gets its name with a numbered suffix
+        for _ in range(200):
+            if not any(x.owner_module == sink.owner_module for x in pulse_inst.sink_list()):
+                break
+            time.sleep(0.01)
+        else:
+            raise RuntimeError('Equalizer module did not unload')
+        module = pulse_inst.module_load('module-ladspa-sink', argument)
+        new_sink = next(x for x in pulse_inst.sink_list() if x.owner_module == module)
+        for stream in stream_list:
+            pulse_inst.sink_input_move(stream, new_sink.index)
+        if is_default:
+            pulse_inst.default_set(new_sink)
+
+    @plugin.tag
+    def get_equalizer(self):
+        """Get the equalizer bands and gains. Gains are None if there is no equalizer"""
+        gains = None
+        with pulse_monitor as pulse:
+            sink = self._get_equalizer_sink(pulse)
+            if sink is not None:
+                gains = equalizer.parse_control(self._get_equalizer_module(pulse, sink).argument)
+        return {'bands': equalizer.BANDS,
+                'gains': gains,
+                'presets': equalizer.PRESETS,
+                'min': equalizer.GAIN_MIN,
+                'max': equalizer.GAIN_MAX}
+
+    @plugin.tag
+    def set_equalizer(self, gains: List[float]):
+        """Set the gains of the equalizer in dB, in the order of the bands of get_equalizer"""
+        gains = equalizer.check_gains(gains)
+        with pulse_monitor as pulse:
+            sink = self._get_equalizer_sink(pulse)
+            if sink is None:
+                raise ValueError('No equalizer configured')
+            argument = self._get_equalizer_module(pulse, sink).argument
+            self._reload_equalizer(pulse, sink, equalizer.replace_control(argument, gains))
+            self._publish_volume(pulse)
+        equalizer.save_gains(gains)
+        logger.info(f'Equalizer set to {gains}')
+        return self.get_equalizer()
 
     def card_list(self) -> List[pulsectl.PulseCardInfo]:
         """Return the list of present sound card"""
